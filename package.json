@@ -1,6 +1,6 @@
 {
     "name": "AllowFFA Launcher",
-    "preductname": "AllowFFA Launcher",
+    "preductname": "allowffa-launcher",
     "version": "1.0.0",
     "description": "Launcher Mincraft pour le serveur AllowFFA",
     "main": "src/app.js",
