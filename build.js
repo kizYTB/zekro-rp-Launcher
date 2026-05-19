@@ -11,7 +11,8 @@ class Index {
     async init() {
         this.obf = true
         this.Fileslist = []
-        process.argv.forEach(async val => {
+
+        for (const val of process.argv) {
             if (val.startsWith('--icon')) {
                 return this.iconSet(val.split('=')[1])
             }
@@ -23,13 +24,16 @@ class Index {
 
             if (val.startsWith('--build')) {
                 let buildType = val.split('=')[1]
-                if (buildType == 'platform') return await this.buildPlatform()
+                if (buildType == 'platform') await this.buildPlatform()
             }
-        });
+        }
     }
 
     async Obfuscate() {
-        if (fs.existsSync("./app")) fs.rmSync("./app", { recursive: true })
+        if (fs.existsSync("./app")) {
+            fs.rmSync("./app", { recursive: true })
+            console.log('📁 Dossier app supprimé, reconstruction en cours...')
+        }
 
         for (let path of this.Fileslist) {
             let fileName = path.split('/').pop()
@@ -43,28 +47,33 @@ class Index {
                 code = code.replace(/src\//g, 'app/');
                 if (this.obf) {
                     await new Promise((resolve) => {
-                        console.log(`Obfuscate ${path}`);
+                        console.log(`🔒 Obfuscation de ${path}...`);
                         let obf = JavaScriptObfuscator.obfuscate(code, { optionsPreset: 'medium-obfuscation', disableConsoleOutput: false });
                         resolve(fs.writeFileSync(`${folder}/${fileName}`, obf.getObfuscatedCode(), { encoding: "utf-8" }));
                     })
                 } else {
-                    console.log(`Copy ${path}`);
+                    console.log(`📄 Copie de ${path}...`);
                     fs.writeFileSync(`${folder}/${fileName}`, code, { encoding: "utf-8" });
                 }
             } else {
                 fs.copyFileSync(path, `${folder}/${fileName}`);
             }
         }
+
+        console.log('✅ Obfuscation terminée !')
     }
 
     async buildPlatform() {
+        console.log('🚀 Démarrage du build...')
         await this.Obfuscate();
+
+        console.log('📦 Packaging de l\'application...')
         builder.build({
             config: {
                 generateUpdatesFilesForAllChannels: false,
                 appId: preductname,
                 productName: preductname,
-                copyright: `Copyright © 2020-${new Date().getFullYear()} Luuxis`,
+                copyright: `Copyright © 2020-${new Date().getFullYear()} www.ki-z.fr`,
                 artifactName: "${productName}-${os}-${arch}.${ext}",
                 extraMetadata: { main: 'app/app.js' },
                 files: ["app/**/*", "package.json", "LICENSE.md"],
@@ -133,9 +142,9 @@ class Index {
                 }
             }
         }).then(() => {
-            console.log('le build est terminé')
+            console.log('✅ Build terminé avec succès ! Les fichiers sont dans le dossier dist/')
         }).catch(err => {
-            console.error('Error during build!', err)
+            console.error('❌ Erreur pendant le build !', err)
         })
     }
 
@@ -152,13 +161,35 @@ class Index {
         return file;
     }
 
-    async iconSet() {
-        const buffer = fs.readFileSync('src/assets/images/icon/icon.png');
+    async iconSet(iconPath) {
+        const sourcePath = iconPath || 'src/assets/images/icon/icon.png'
+        console.log(`🖼️  Génération des icônes depuis : ${sourcePath}`)
+
+        let buffer;
+        const isUrl = sourcePath.startsWith('http://') || sourcePath.startsWith('https://');
+        if (isUrl) {
+            console.log('🌐 Téléchargement de l\'image...')
+            const res = await fetch(sourcePath);
+            if (!res.ok) throw new Error(`Impossible de télécharger l'image : ${res.status} ${res.statusText}`)
+            buffer = Buffer.from(await res.arrayBuffer());
+            console.log('✅ Image téléchargée !')
+        } else {
+            buffer = fs.readFileSync(sourcePath);
+        }
+
         let image = await Jimp.read(buffer);
         image = await image.resize({ w: 256, h: 256 }).getBuffer(JimpMime.png);
+
         fs.writeFileSync("src/assets/images/icon/icon.icns", png2icons.createICNS(image, png2icons.BILINEAR, 0));
+        console.log('✅ icon.icns généré')
+
         fs.writeFileSync("src/assets/images/icon/icon.ico", png2icons.createICO(image, png2icons.HERMITE, 0, false));
+        console.log('✅ icon.ico généré')
+
         fs.writeFileSync("src/assets/images/icon/icon.png", image);
+        console.log('✅ icon.png généré')
+
+        console.log('🎉 Toutes les icônes ont été générées avec succès !')
     }
 }
 

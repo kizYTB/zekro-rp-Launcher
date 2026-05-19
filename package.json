@@ -1,20 +1,20 @@
 {
-    "name": "Selvania-Launcher",
-    "preductname": "Selvania Launcher",
-    "version": "2.2.2",
-    "description": "Launcher Mincraft pour le serveur Selvania",
+    "name": "AllowFFA Launcher",
+    "preductname": "AllowFFA Launcher",
+    "version": "1.0.0",
+    "description": "Launcher Mincraft pour le serveur AllowFFA",
     "main": "src/app.js",
     "author": {
-        "name": "luuxis, Inc.",
-        "email": "contact@luuxis.fr",
-        "url": "https://github.com/luuxis"
+        "name": "www.ki-z.fr",
+        "email": "kiz@ki-z.fr",
+        "url": "https://github.com/KizYTB"
     },
-    "url": "http://luuxcraft.fr/api/user/bb8f5247-1d38-41bb-ab6d-3200471a06b2",
+    "url": "http://launcher.allowffa.fr",
     "scripts": {
         "start": "cross-env-shell NODE_ENV=dev electron .",
         "dev": "cross-env-shell DEV_TOOL=open nodemon --exec npm start",
         "build": "node build.js --obf=true --build=platform",
-        "icon": "node build.js --icon"
+        "icon": "node build.js --icon=https://allowffa.fr/storage/img/logo.png"
     },
     "license": "CCANC",
     "nodemonConfig": {
@@ -33,12 +33,12 @@
         "electron": "^40.0.0",
         "electron-builder": "^26.0.12",
         "javascript-obfuscator": "^5.1.0",
-        "jimp": "^1.6.0",
+        "jimp": "^1.6.1",
         "nodemon": "^3.1.11",
         "png2icons": "^2.0.1"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/luuxis/Selvania-Launcher.git"
+        "url": "git+https://github.com/kizYTB/zekro-rp-Launcher.git"
     }
 }
